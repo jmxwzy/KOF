@@ -120,17 +120,74 @@ class Player extends GameObject {
         }
     }
 
+    is_attack() {
+        this.status = 5;
+        this.frame_current_cnt = 0;
+    }
+
+    is_collision(r1, r2) {
+        if (Math.max(r1.x1, r2.x1) > Math.min(r1.x2, r2.x2))
+            return false;
+        if (Math.max(r1.y1, r2.y1) > Math.min(r1.y2, r2.y2))
+            return false;
+        return true;
+    }
+
+    update_attack() {
+        if (this.status === 4 && this.frame_current_cnt === 18) {
+            let players = this.root.players;
+            let me = this, you = players[1 - this.id];
+            let r1;
+            if(this.direction > 0) {
+                r1 = { // (x1, y1) 表示挥重拳的角色的黄色方框左上角坐标, (x2, y2) 表示挥重拳的角色的黄色方框右下角坐标
+                    x1: me.x + 120,
+                    y1: me.y + 40,
+                    x2: me.x + 120 + 100,
+                    y2: me.y + 40 + 20
+                };
+            } else {
+                r1 = {
+                    x1: me.x + me.width - 120 - 100,
+                    y1: me.y + 40,
+                    x2: me.x + me.width - 120 - 100 + 100,
+                    y2: me.y + 40 + 20
+                };    
+            }
+
+            let r2 = { // 重拳打的角色(不一定被打中)
+                x1: you.x,
+                y1: you.y,
+                x2: you.x + you.width,
+                y2: you.y + you.height
+            }; 
+
+            if (this.is_collision(r1, r2)) {
+                you.is_attack();
+            }
+        }
+    }
+
     update() {
         this.update_control();
         this.update_move();
         this.update_direction();
+        this.update_attack();
 
         this.render();
     }
 
     render() {
-        // this.ctx.fillStyle = this.color;
-        // this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        // this.ctx.fillStyle = this.color; 
+        // this.ctx.fillRect(this.x, this.y, this.width, this.height); // 显示两边人物的渲染方块
+        
+        // if (this.direction > 0) {
+        //     this.ctx.fillStyle = 'yellow';
+        //     this.ctx.fillRect(this.x + 120, this.y + 40, 100, 20); // 显示两边人物重拳的渲染小方块
+        // } else {
+        //     this.ctx.fillStyle = 'yellow';
+        //     this.ctx.fillRect(this.x + this.width - 120 - 100, this.y + 40, 100, 20); // 显示两边人物重拳的渲染小方块
+        // }
+        
 
         let status = this.status;
 
@@ -161,7 +218,7 @@ class Player extends GameObject {
             
         } 
 
-        if (status === 4) {
+        if (status === 4 || status === 5){
             if (this.frame_current_cnt == obj.frame_rate * (obj.frame_cnt - 1)) {
                 this.status = 0;
                 // this.frame_current_cnt = 0;
