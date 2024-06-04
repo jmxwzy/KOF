@@ -17,7 +17,7 @@ class Kyo extends Player {
             this.animations.set(i, {
                 gif: gif,
                 frame_cnt: 0, // 有多少帧
-                frame_rate: 10, // 每秒刷多少帧
+                frame_rate: 12, // 每秒刷多少帧
                 offset_y: offsets[i], // 竖直方向的偏移量
                 loaded: false, // 是否被加载出来
                 scale: 2 //缩放倍数
