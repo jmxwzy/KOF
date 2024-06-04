@@ -31,6 +31,8 @@ class Player extends GameObject {
         this.animations = new Map();
         this.frame_current_cnt = 0; // 当前记录了多少帧
 
+        this.hp = 100;
+
         // console.log(this.status);
     }
 
@@ -39,17 +41,42 @@ class Player extends GameObject {
     }
     
     update_move() {
-        if (this.status === 3) {
-            this.vy += this.gravity;
-        }
+        this.vy += this.gravity;
         
         this.x += this.vx * this.timedelta / 1000;
         this.y += this.vy * this.timedelta / 1000;
 
+        // 判断两名玩家不重叠
+        // let [a, b] = this.root.players;
+        // if (a !== this) [a, b] = [b, a];
+        // let r1 = {
+        //     x1: a.x,
+        //     y2: a.y,
+        //     x2: a.x + a.width,
+        //     y2: a.y + a.height
+        // };
+        // let r2 = {
+        //     x1: b.x,
+        //     y2: b.y,
+        //     x2: b.x + b.width,
+        //     y2: b.y + b.height
+        // };
+        // if(this.is_collision(r1, r2)) {
+        //     b.x += this.vx * this.timedelta / 1000 / 2;
+        //     b.y += this.vy * this.timedelta / 1000 / 2;
+        //     a.x -= this.vx * this.timedelta / 1000 / 2;
+        //     a.y -= this.vy * this.timedelta / 1000 / 2;
+
+        //     if (this.status === 3) {
+        //         this.status = 0;
+        //     }
+        // }
+
         if (this.y > 450) {
             this.y = 450;
             this.vy = 0;
-            this.status = 0;
+
+            if (this.status === 3) this.status = 0;
         } 
 
         if (this.x < 0) {
@@ -59,6 +86,8 @@ class Player extends GameObject {
         }
 
         // console.log(this.status);
+
+        
     }
 
     update_control() { //两名玩家的按键设置
@@ -109,6 +138,10 @@ class Player extends GameObject {
     }
 
     update_direction() {
+        if (this.status === 6) {
+            return ;
+        }
+
         let players = this.root.players;
         if (players[0] && players[1]) {
             let me = this, you = players[1 - this.id];
@@ -121,8 +154,18 @@ class Player extends GameObject {
     }
 
     is_attack() {
+        if (this.status === 6) {
+            return ;
+        }
+
         this.status = 5;
         this.frame_current_cnt = 0;
+
+        this.hp = Math.max(this.hp - 10, 0);
+        if (this.hp <= 0 ) {
+            this.status = 6;
+            this.frame_current_cnt = 0;
+        }
     }
 
     is_collision(r1, r2) {
@@ -218,9 +261,13 @@ class Player extends GameObject {
             
         } 
 
-        if (status === 4 || status === 5){
+        if (status === 4 || status === 5 || status === 6) {
             if (this.frame_current_cnt == obj.frame_rate * (obj.frame_cnt - 1)) {
-                this.status = 0;
+                if (status === 6) {
+                    this.frame_current_cnt --;
+                } else {
+                    this.status = 0;
+                }
                 // this.frame_current_cnt = 0;
             }
         }
