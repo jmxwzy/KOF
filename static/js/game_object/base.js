@@ -3,7 +3,7 @@ let GAME_OBJECTS = [];
 class GameObject { // 渲染类
     constructor() {
         GAME_OBJECTS.push(this);
-        this.timedelta = 0;
+        this.timedelta = 0; // 当前这一帧距离上一帧的时间间隔
         this.has_call_started = false;
     }
 

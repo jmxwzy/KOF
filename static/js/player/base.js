@@ -32,6 +32,8 @@ class Player extends GameObject {
         this.frame_current_cnt = 0; // 当前记录了多少帧
 
         this.hp = 100;
+        this.$hp = this.root.$kof.find(`.kof-head-hp-${this.id}>div`);
+        this.$hp_div = this.root.$kof.find(`.kof-head-hp-${this.id}>div>div`);
 
         // console.log(this.status);
     }
@@ -87,7 +89,6 @@ class Player extends GameObject {
 
         // console.log(this.status);
 
-        
     }
 
     update_control() { //两名玩家的按键设置
@@ -162,7 +163,25 @@ class Player extends GameObject {
         this.frame_current_cnt = 0;
 
         this.hp = Math.max(this.hp - 10, 0);
+        this.$hp_div.animate({
+            width: this.$hp.parent().width() * this.hp / 100
+        }, 300);
+        this.$hp.animate({
+            width: this.$hp.parent().width() * this.hp / 100
+        }, 600);
+
+        // 击退
+        if (this.direction > 0) {
+            this.vx -= 100;
+            this.vy -= 300;
+        } else {
+            this.vx += 100;
+            this.vy -= 300;
+        }
+
         if (this.hp <= 0 ) {
+            this.vx = 0;
+            this.vy = 0;
             this.status = 6;
             this.frame_current_cnt = 0;
         }
